@@ -6,3 +6,6 @@
 *.swp
 *.xcuserstate
 DerivedData/
+
+# macOS
+.DS_Store

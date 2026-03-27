@@ -55,6 +55,8 @@ struct MainAppView: View {
     @State private var showAddCredits  = false
     // Low credits state — true when user is running low
     @State private var isLowCredits    = false
+    // Widget preview
+    @State private var showPulseWidget = false
 
     let onSignOut: () -> Void
 
@@ -146,31 +148,58 @@ struct MainAppView: View {
                     .transition(.scale(scale: 0.96).combined(with: .opacity))
             }
 
-            // ── Low credits demo toggle (dev helper, top-right) ──
+            // ── Dev toggles (top-right) ──────────────────────────
             VStack {
                 HStack {
                     Spacer()
-                    Button(action: { withAnimation { isLowCredits.toggle() } }) {
-                        Label(isLowCredits ? "Normal Credits" : "Simulate Low Credits",
-                              systemImage: isLowCredits ? "checkmark.circle" : "exclamationmark.triangle")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(isLowCredits ? Color(hex: "009684") : Color(hex: "737373"))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color(hex: "F5F5F5"))
-                            .clipShape(Capsule())
+                    VStack(alignment: .trailing, spacing: 6) {
+                        Button(action: { withAnimation { isLowCredits.toggle() } }) {
+                            Label(isLowCredits ? "Normal Credits" : "Simulate Low Credits",
+                                  systemImage: isLowCredits ? "checkmark.circle" : "exclamationmark.triangle")
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(isLowCredits ? Color(hex: "009684") : Color(hex: "737373"))
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color(hex: "F5F5F5"))
+                                .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+
+                        Button(action: { withAnimation { showPulseWidget.toggle() } }) {
+                            Label(showPulseWidget ? "Hide Widget" : "Simulate Widget",
+                                  systemImage: "waveform")
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(showPulseWidget ? Color(hex: "009684") : Color(hex: "737373"))
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color(hex: "F5F5F5"))
+                                .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                     .padding(.top, 10)
                     .padding(.trailing, 14)
                 }
                 Spacer()
+            }
+
+            // ── PulseWidget overlay ───────────────────────────────
+            if showPulseWidget {
+                VStack {
+                    Spacer()
+                    PulseWidget(isRecording: true)
+                        .shadow(color: .black.opacity(0.25), radius: 12, x: 0, y: 4)
+                        .padding(.bottom, 32)
+                }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .allowsHitTesting(false)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(.easeInOut(duration: 0.2), value: isShowingDictModal)
         .animation(.easeInOut(duration: 0.2), value: showSettings)
         .animation(.easeInOut(duration: 0.2), value: showAddCredits)
+        .animation(.spring(response: 0.35, dampingFraction: 0.75), value: showPulseWidget)
     }
 
     // MARK: - Modal content
@@ -552,7 +581,7 @@ struct HomeFnCard: View {
                     .font(.system(size: 15, weight: .regular, design: .monospaced))
                     .foregroundColor(.white)
             }
-            .frame(width: 36, height: 28)
+            .frame(width: 32, height: 32)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("Hold Fn to start dictating")
