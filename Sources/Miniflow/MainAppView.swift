@@ -379,9 +379,9 @@ struct AppSidebar: View {
 
                 // Nav items
                 VStack(spacing: 4) {
-                    SidebarTab(icon: "house",     label: "Home",       tab: .home,       selected: selectedTab) { selectedTab = .home }
-                    SidebarTab(icon: "character", label: "Dictionary", tab: .dictionary, selected: selectedTab) { selectedTab = .dictionary }
-                    SidebarTab(icon: "command",   label: "Shortcuts",  tab: .shortcuts,  selected: selectedTab) { selectedTab = .shortcuts }
+                    SidebarTab(icon: "house",       label: "Home",       tab: .home,       selected: selectedTab) { selectedTab = .home }
+                    SidebarTab(icon: "textformat",  label: "Dictionary", tab: .dictionary, selected: selectedTab) { selectedTab = .dictionary }
+                    SidebarTab(icon: "command",     label: "Shortcuts",  tab: .shortcuts,  selected: selectedTab) { selectedTab = .shortcuts }
                 }
                 .padding(.horizontal, 20)
             }
@@ -483,7 +483,7 @@ struct HomeView: View {
     var isLowCredits: Bool = false
 
     private let history: [HistoryEntry] = [
-        HistoryEntry(iconBg: Color(hex: "FCE7F3"), iconName: "command",     iconColor: Color(hex: "EC4899"), command: "Can you open Chrome?", time: "02:34 PM"),
+        HistoryEntry(iconBg: Color(hex: "FCE7F3"), iconName: "clock",        iconColor: Color(hex: "EC4899"), command: "Can you open Chrome?", time: "02:34 PM"),
         HistoryEntry(iconBg: Color(hex: "DBEAFE"), iconName: "bubble.left", iconColor: Color(hex: "3B82F6"), command: "As an enterprise user >> user is now having no option to add credit, auto recharge, avail coupons and add payment method which earlier we had", time: "02:34 PM"),
         HistoryEntry(iconBg: Color(hex: "DBEAFE"), iconName: "bubble.left", iconColor: Color(hex: "3B82F6"), command: "As an enterprise user >> user is now having no option to add credit, auto recharge, avail coupons and add payment method which earlier we had", time: "02:34 PM"),
         HistoryEntry(iconBg: Color(hex: "DBEAFE"), iconName: "bubble.left", iconColor: Color(hex: "3B82F6"), command: "As an enterprise user >> user is now having no option to add credit, auto recharge, avail coupons and add payment method which earlier we had", time: "02:34 PM")
@@ -656,7 +656,7 @@ struct DictionaryView: View {
                 }
 
                 InfoCard(
-                    icon: "a.magnify",
+                    icon: "textformat.characters",
                     title: "Your words, always spelled right",
                     subtitle: "MiniFlow learns your unique words and names as you speak, or add them yourself. From client names to industry jargon, MiniFlow gets every word right."
                 )
@@ -698,7 +698,7 @@ struct ShortcutsView: View {
                 }
 
                 InfoCard(
-                    icon: "command.square",
+                    icon: "keyboard",
                     title: "Say it once. Use it forever",
                     subtitle: "Save your most-used text as shortcuts, links, intros, sign-offs, addresses and speak them into any app in seconds. No retyping, no hunting through old messages."
                 )

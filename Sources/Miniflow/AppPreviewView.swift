@@ -56,9 +56,9 @@ struct SidebarView: View {
 
                 // Nav items — gap 6.713px
                 VStack(alignment: .leading, spacing: 6.7) {
-                    SidebarNavItem(icon: "house",     label: "Home",       active: true)
-                    SidebarNavItem(icon: "character", label: "Dictionary", active: false)
-                    SidebarNavItem(icon: "command",   label: "Shortcuts",  active: false)
+                    SidebarNavItem(icon: "house",      label: "Home",       active: true)
+                    SidebarNavItem(icon: "textformat", label: "Dictionary", active: false)
+                    SidebarNavItem(icon: "command",    label: "Shortcuts",  active: false)
                 }
             }
             .padding(.horizontal, 16.8)

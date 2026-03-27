@@ -17,8 +17,8 @@ enum SettingsTab: CaseIterable {
         switch self {
         case .account: return "person.circle"
         case .system:  return "gearshape"
-        case .usage:   return "arrow.clockwise.circle"
-        case .billing: return "doc.text"
+        case .usage:   return "bolt.circle"
+        case .billing: return "creditcard"
         }
     }
 }
