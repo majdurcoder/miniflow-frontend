@@ -379,14 +379,8 @@ struct AppSidebar: View {
 
             // ── Top ──────────────────────────────────
             VStack(alignment: .leading, spacing: 0) {
-                // Traffic lights + branding
+                // Branding
                 VStack(alignment: .leading, spacing: 12) {
-                    HStack(spacing: 6) {
-                        Circle().fill(Color(hex: "FF5F57")).frame(width: 13, height: 13)
-                        Circle().fill(Color(hex: "FFBD2E")).frame(width: 13, height: 13)
-                        Circle().fill(Color(hex: "28C840")).frame(width: 13, height: 13)
-                    }
-
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Miniflow ™")
                             .font(.system(size: 18, weight: .semibold))

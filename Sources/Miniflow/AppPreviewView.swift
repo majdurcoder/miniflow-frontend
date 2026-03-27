@@ -29,14 +29,8 @@ struct SidebarView: View {
             // ── Top section ──────────────────────────
             VStack(alignment: .leading, spacing: 16.8) {
 
-                // Traffic lights + branding
+                // Branding
                 VStack(alignment: .leading, spacing: 20.1) {
-                    HStack(spacing: 4.7) {
-                        Circle().fill(Color(hex: "FF5F57")).frame(width: 13.3, height: 13.3)
-                        Circle().fill(Color(hex: "FFBD2E")).frame(width: 13.3, height: 13.3)
-                        Circle().fill(Color(hex: "28C840")).frame(width: 13.3, height: 13.3)
-                    }
-
                     VStack(alignment: .leading, spacing: 3.4) {
                         Text("Miniflow ™")
                             .font(.geist(15.1, weight: .medium))
