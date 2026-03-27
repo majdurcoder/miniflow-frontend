@@ -53,6 +53,8 @@ struct MainAppView: View {
     @State private var settingsTab: SettingsTab = .account
     // Add Credits — lifted to top level so overlay covers full screen
     @State private var showAddCredits  = false
+    // Low credits state — true when user is running low
+    @State private var isLowCredits    = false
 
     let onSignOut: () -> Void
 
@@ -69,9 +71,11 @@ struct MainAppView: View {
             HStack(spacing: 0) {
                 AppSidebar(
                     selectedTab: $selectedTab,
+                    isLowCredits: isLowCredits,
                     onSignOut: onSignOut,
                     onManageCredits: { settingsTab = .usage;   showSettings = true },
-                    onOpenSettings:  { settingsTab = .account; showSettings = true }
+                    onOpenSettings:  { settingsTab = .account; showSettings = true },
+                    onAddCredits:    { showAddCredits = true }
                 )
                     .frame(width: 260)
 
@@ -79,7 +83,8 @@ struct MainAppView: View {
                     Color.white
                     switch selectedTab {
                     case .home:
-                        HomeView().transition(.opacity)
+                        HomeView(isLowCredits: isLowCredits)
+                            .transition(.opacity)
                     case .dictionary:
                         DictionaryView(
                             entries: $dictEntries,
@@ -139,6 +144,27 @@ struct MainAppView: View {
 
                 AddCreditsModal(onClose: { showAddCredits = false })
                     .transition(.scale(scale: 0.96).combined(with: .opacity))
+            }
+
+            // ── Low credits demo toggle (dev helper, top-right) ──
+            VStack {
+                HStack {
+                    Spacer()
+                    Button(action: { withAnimation { isLowCredits.toggle() } }) {
+                        Label(isLowCredits ? "Normal Credits" : "Simulate Low Credits",
+                              systemImage: isLowCredits ? "checkmark.circle" : "exclamationmark.triangle")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(isLowCredits ? Color(hex: "009684") : Color(hex: "737373"))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color(hex: "F5F5F5"))
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, 10)
+                    .padding(.trailing, 14)
+                }
+                Spacer()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -201,13 +227,123 @@ struct MainAppView: View {
     }
 }
 
+// MARK: - Normal Credits Card
+
+struct NormalCreditsCard: View {
+    let onManageCredits: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    Text("$10").font(.system(size: 12, weight: .semibold)).foregroundColor(.white)
+                    Text("Credits remaining").font(.system(size: 11, weight: .regular)).foregroundColor(Color(hex: "A1A1A1"))
+                }
+                HStack(spacing: 6) {
+                    Text("100").font(.system(size: 12, weight: .semibold)).foregroundColor(.white)
+                    Text("Dictation minutes left").font(.system(size: 11, weight: .regular)).foregroundColor(Color(hex: "A1A1A1"))
+                }
+            }
+            Button(action: onManageCredits) {
+                Text("Manage Credits")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(Color.black.opacity(0.25))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(14)
+        .background(Color.black.opacity(0.75))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
+        )
+    }
+}
+
+// MARK: - Low Credits Warning Card
+// Figma: bg-rgba(0,0,0,0.6), border rgba(255,255,255,0.2), rounded-16, p-12
+// Decorative pink glow blob at bottom-left
+
+struct LowCreditsCard: View {
+    let onAddCredits: () -> Void
+
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            // Decorative pinkish glow (Figma: imgEllipse1 at bottom-left offset)
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [Color(hex: "FF6B8A").opacity(0.55), Color.clear],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: 62
+                    )
+                )
+                .frame(width: 125, height: 125)
+                .offset(x: -47, y: 88)
+                .blur(radius: 8)
+
+            // Card content
+            VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
+                    // "You're running low." — 14px medium white
+                    Text("You're running low.")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.white)
+
+                // Mixed-color description
+                    let desc = Text("You have ").foregroundColor(.white.opacity(0.5))
+                        + Text("$2.00 ").foregroundColor(.white)
+                        + Text("or ").foregroundColor(.white.opacity(0.5))
+                        + Text("23 mins").foregroundColor(.white)
+                        + Text(" remaining.\n").foregroundColor(.white.opacity(0.5))
+                        + Text("Add more to keep building.").foregroundColor(.white.opacity(0.5))
+                    desc
+                        .font(.system(size: 12, weight: .regular))
+                        .lineSpacing(2)
+                }
+
+                // "Add Credits" button — bg rgba(0,0,0,0.2), h-36, rounded-12, 12px Inter medium
+                Button(action: onAddCredits) {
+                    Text("Add Credits")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 36)
+                        .background(Color.black.opacity(0.2))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(12)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.black.opacity(0.6))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(Color.white.opacity(0.2), lineWidth: 1)
+        )
+        .clipped()
+    }
+}
+
 // MARK: - Sidebar
 
 struct AppSidebar: View {
     @Binding var selectedTab: AppTab
+    var isLowCredits: Bool = false
     let onSignOut: () -> Void
     let onManageCredits: () -> Void
     let onOpenSettings: () -> Void
+    let onAddCredits: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -254,36 +390,13 @@ struct AppSidebar: View {
 
             // ── Bottom ───────────────────────────────
             VStack(alignment: .leading, spacing: 20) {
-                // Credits card
-                VStack(alignment: .leading, spacing: 12) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 6) {
-                            Text("$10").font(.system(size: 12, weight: .semibold)).foregroundColor(.white)
-                            Text("Credits remaining").font(.system(size: 11, weight: .regular)).foregroundColor(Color(hex: "A1A1A1"))
-                        }
-                        HStack(spacing: 6) {
-                            Text("100").font(.system(size: 12, weight: .semibold)).foregroundColor(.white)
-                            Text("Dictation minutes left").font(.system(size: 11, weight: .regular)).foregroundColor(Color(hex: "A1A1A1"))
-                        }
-                    }
-                    Button(action: onManageCredits) {
-                        Text("Manage Credits")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 8)
-                            .background(Color.black.opacity(0.25))
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                    }
-                    .buttonStyle(.plain)
+
+                // Credits card — normal or low-credits warning
+                if isLowCredits {
+                    LowCreditsCard(onAddCredits: onAddCredits)
+                } else {
+                    NormalCreditsCard(onManageCredits: onManageCredits)
                 }
-                .padding(14)
-                .background(Color.black.opacity(0.75))
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
-                )
 
                 // User row
                 HStack(spacing: 0) {
@@ -367,6 +480,8 @@ struct SidebarTab: View {
 // MARK: - Home View
 
 struct HomeView: View {
+    var isLowCredits: Bool = false
+
     private let history: [HistoryEntry] = [
         HistoryEntry(iconBg: Color(hex: "FCE7F3"), iconName: "command",     iconColor: Color(hex: "EC4899"), command: "Can you open Chrome?", time: "02:34 PM"),
         HistoryEntry(iconBg: Color(hex: "DBEAFE"), iconName: "bubble.left", iconColor: Color(hex: "3B82F6"), command: "As an enterprise user >> user is now having no option to add credit, auto recharge, avail coupons and add payment method which earlier we had", time: "02:34 PM"),
@@ -374,12 +489,22 @@ struct HomeView: View {
         HistoryEntry(iconBg: Color(hex: "DBEAFE"), iconName: "bubble.left", iconColor: Color(hex: "3B82F6"), command: "As an enterprise user >> user is now having no option to add credit, auto recharge, avail coupons and add payment method which earlier we had", time: "02:34 PM")
     ]
 
+    private var greeting: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 5..<12:  return "Good morning, Devansh"
+        case 12..<18: return "Good afternoon, Devansh"
+        case 18..<23: return "Good evening, Devansh"
+        default:      return "Good night, Devansh"
+        }
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 32) {
 
-                // Greeting
-                Text("Welcome to Miniflow, Devansh")
+                // Time-based greeting when low on credits; welcome otherwise
+                Text(isLowCredits ? greeting : "Welcome to Miniflow, Devansh")
                     .font(.system(size: 28, weight: .regular))
                     .foregroundColor(.black)
 
